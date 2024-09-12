@@ -1,0 +1,21 @@
+
+
+services:
+  keycloak: # Nom du service Keycloak
+    container_name: keycloak # Définit le nom du conteneur Docker pour le service Keycloak
+    image: quay.io/keycloak/keycloak:21.1.1 # Image Docker de Keycloak version 21.1.1 provenant du registre Quay.io
+    environment: # Variables d'environnement pour configurer Keycloak
+      KEYCLOAK_ADMIN: admin # Nom d'utilisateur pour l'administrateur Keycloak
+      KEYCLOAK_ADMIN_PASSWORD: admin # Mot de passe pour l'utilisateur administrateur Keycloak
+    ports:
+      - "9090:8080" # Redirige le port 8080 (interne) du conteneur vers le port 9090 (externe) de l'hôte
+    command:
+      - "start-dev" # Commande pour démarrer Keycloak en mode de développement
+
+
+
+
+
+
+
+
