@@ -3,13 +3,21 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/Amoura
+          # URI de l'émetteur (issuer) des tokens JWT. Il s'agit du point de départ pour valider les JWT.
+          issuer-uri: http://localhost:9090/realms/Amoura
+
+          # URI du JWK Set, où l'application récupère les clés publiques pour vérifier les signatures des JWT.
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
 server:
+  # Le port sur lequel l'application Spring Boot est déployée. Ici, elle écoutera sur le port 8081.
   port: 8081
 
 jwt:
   auth:
     converter:
+      # Identifiant de la ressource pour laquelle le token est valide. Ici, le nom est "amoura-rest-api".
       resource-id: amoura-rest-api
+
+      # Attribut utilisé comme identifiant principal (principal) dans le token JWT. Ici, on utilise "preferred_username" comme attribut principal.
       principle-attribute: preferred_username
