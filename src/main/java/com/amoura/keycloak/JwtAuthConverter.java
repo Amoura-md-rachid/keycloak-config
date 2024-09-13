@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 /**
  * Classe permettant de convertir un token JWT en un token d'authentification Spring Security.
- *
  * Cette classe extrait les rôles et les autorités à partir du token JWT, notamment les rôles définis dans la section
  * 'resource_access' du token Keycloak.
  */
