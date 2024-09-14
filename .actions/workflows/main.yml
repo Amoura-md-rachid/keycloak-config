@@ -1,0 +1,38 @@
+# Nom du workflow, il apparaîtra dans l'onglet Actions de GitHub
+name: Build & Deploy Spring app
+
+# Déclencheur d'événement, ce workflow s'exécutera lorsqu'un push sera effectué sur la branche 'main'
+on:
+  push:
+    branches:
+      - main
+
+# Définition des jobs (tâches) à exécuter dans le pipeline
+jobs:
+  build-deploy: # Nom du job, représentant les étapes de construction et déploiement
+    name: Build and Deploy Spring Boot app config Keycloak # Description du job
+    runs-on: ubuntu-latest # Utilise un runner GitHub basé sur la dernière version d'Ubuntu pour exécuter les étapes
+
+    steps: # Début des étapes du job
+
+      # Étape 1: Récupération du code source à partir du dépôt GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4 # Action officielle GitHub pour cloner le dépôt sur le runner
+
+      # Étape 2: Installation de JDK 17
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4 # Action GitHub pour installer Java
+        with:
+          distribution: 'corretto' # Utilise la distribution Corretto d'Amazon pour JDK 17
+          java-version: '17' # Version de Java à installer
+
+      # Étape 3: Exécution des tests unitaires
+      - name: Unit Tests
+        run: mvn -B test --file pom.xml # Exécute les tests avec Maven sur le fichier pom.xml
+        # -B active le mode batch pour réduire les sorties interactives
+
+      # Étape 4: Construction de l'application
+      - name: Build the application
+        run: |
+          mvn clean # Nettoie les fichiers de construction précédents
+          mvn -B package --file pom.xml # Construit l'application en générant un fichier exécutable (JAR/ WAR)
