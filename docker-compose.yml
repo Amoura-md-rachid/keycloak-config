@@ -1,11 +1,25 @@
+version: '3' # Spécifie la version de la syntaxe Docker Compose utilisée (ici version 3, compatible avec la plupart des versions de Docker)
+
 services:
   keycloak: # Déclaration du service Keycloak
     container_name: keycloak # Définit un nom spécifique pour le conteneur (facilite son identification)
     image: quay.io/keycloak/keycloak:21.1.1 # Spécifie l'image Docker à utiliser (Keycloak version 21.1.1 depuis Quay.io)
+
     environment: # Liste des variables d'environnement à injecter dans le conteneur
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin} # Utilise la variable d'environnement KEYCLOAK_ADMIN définie dans le fichier .env ou par le système, sinon utilise 'admin' par défaut
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin} # Utilise la variable d'environnement KEYCLOAK_ADMIN_PASSWORD définie dans le fichier .env ou par le système, sinon utilise 'admin' par défaut
+
     ports:
-      - "9090:8080" # Redirige le port 8080 du conteneur (port par défaut de Keycloak) vers le port 9090 de la machine hôte
+      - "9090:8080" # Expose le port 8080 du conteneur (port par défaut de Keycloak) sur le port 9090 de l'hôte pour accéder à l'interface Keycloak depuis l'extérieur
+
     command:
-      - "start-dev" # Commande exécutée lors du démarrage du conteneur (ici, démarre Keycloak en mode développement)
+      - start-dev # Démarre Keycloak en mode développement
+      - --hostname-strict=false # Désactive la vérification stricte du nom d'hôte (utile en développement pour accepter des requêtes depuis des hôtes non définis)
+      - --hostname-strict-https=false # Désactive la vérification stricte du nom d'hôte pour les connexions HTTPS (utile pour éviter des erreurs en environnement local ou non sécurisé)
+
+    networks:
+      - keycloak-network # Associe ce service au réseau personnalisé 'keycloak-network' pour permettre la communication avec d'autres services du même réseau
+
+networks:
+  keycloak-network:
+    driver: bridge # Utilise un réseau de type 'bridge' pour isoler le service Keycloak tout en permettant la communication avec d'autres conteneurs connectés au même réseau
