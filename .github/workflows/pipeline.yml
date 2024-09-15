@@ -1,11 +1,11 @@
 # Nom du workflow, il apparaîtra dans l'onglet Actions de GitHub
-name: Build & Deploy Spring app
+name: Build & Deploy Spring app config
 
 # Déclencheur d'événement, ce workflow s'exécutera lorsqu'un push sera effectué sur la branche 'main'
 on:
   push:
     branches:
-      - main
+      - feature/github-actions-cicd-pipeline
 
 # Définition des jobs (tâches) à exécuter dans le pipeline
 jobs:
@@ -36,3 +36,4 @@ jobs:
         run: |
           mvn clean # Nettoie les fichiers de construction précédents
           mvn -B package --file pom.xml # Construit l'application en générant un fichier exécutable (JAR/ WAR)
+      
