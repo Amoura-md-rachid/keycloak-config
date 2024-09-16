@@ -1,0 +1,49 @@
+version: '3'  # Version de la syntaxe de Docker Compose utilisée
+
+volumes:
+  keycloak-db-data:  # Volume pour persister les données de la base de données PostgreSQL
+
+services:
+  keycloak-db:  # Service pour PostgreSQL, utilisé par Keycloak
+    image: postgres  # Utilise l'image officielle PostgreSQL
+    container_name: keycloak-db  # Nom du conteneur pour identifier facilement ce service
+    restart: always  # Le conteneur redémarre toujours en cas d'arrêt ou d'échec
+    ports:
+      - "5434:5432"  # Mappe le port 5432 (par défaut pour PostgreSQL) au port 5434 sur l'hôte
+    environment:
+      POSTGRES_DB: keycloak  # Nom de la base de données qui sera créée dans PostgreSQL
+      POSTGRES_USER: keycloak  # Utilisateur de la base de données
+      POSTGRES_PASSWORD: password  # Mot de passe pour l'utilisateur
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data  # Attache un volume pour persister les données PostgreSQL
+    networks:
+      - keycloak-network  # Connecte ce service au réseau 'keycloak-network' pour qu'il puisse communiquer avec d'autres services
+
+  keycloak:  # Service pour Keycloak, le serveur d'authentification
+    image: bitnami/keycloak:16.1.1-debian-10-r11  # Utilise une image spécifique de Keycloak
+    environment:
+      DB_VENDOR: POSTGRES  # Spécifie que Keycloak utilisera PostgreSQL comme base de données
+      DB_ADDR: keycloak-db  # Adresse de la base de données, ici le nom du service 'keycloak-db' dans le réseau Docker
+      DB_DATABASE: keycloak  # Nom de la base de données à utiliser pour Keycloak
+      DB_USER: keycloak  # Nom d'utilisateur pour se connecter à la base de données
+      DB_SCHEMA: public  # Schéma de la base de données utilisé par Keycloak
+      DB_PASSWORD: password  # Mot de passe pour se connecter à la base de données
+      KEYCLOAK_USER: admin  # Nom d'utilisateur administrateur de Keycloak
+      KEYCLOAK_PASSWORD: Pa55w0rd  # Mot de passe de l'utilisateur administrateur
+      KEYCLOAK_HTTPS_PORT: 8443  # Port HTTPS pour sécuriser les communications avec Keycloak
+      KEYCLOAK_HTTPS_CERTIFICATE_FILE: /opt/bitnami/keycloak/certs/tls.crt  # Chemin du certificat SSL
+      KEYCLOAK_HTTPS_CERTIFICATE_KEY_FILE: /opt/bitnami/keycloak/certs/tls.key  # Chemin de la clé privée SSL
+    ports:
+      - "8088:8080"  # Mappe le port HTTP 8080 de Keycloak au port 8088 de l'hôte
+      - "8443:8443"  # Mappe le port HTTPS 8443 de Keycloak au port 8443 de l'hôte
+    volumes:
+      - ./certs:/opt/bitnami/keycloak/certs  # Monte un volume pour fournir les certificats SSL
+    depends_on:
+      - keycloak-db  # Démarre Keycloak après que 'keycloak-db' soit opérationnel
+#    networks:
+#      - keycloak-network  # Connecte ce service au réseau 'keycloak-network'
+#
+#networks:
+#  keycloak-network:  # Définit un réseau Docker externe partagé entre les services
+#    external:
+#      name: keycloak-network  # Utilise un réseau Docker existant nommé 'keycloak-network'

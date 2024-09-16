@@ -1,12 +1,17 @@
-services:
-  keycloak: # Déclaration du service Keycloak
-    container_name: keycloak # Définit un nom spécifique pour le conteneur (facilite son identification)
-    image: quay.io/keycloak/keycloak:21.1.1 # Spécifie l'image Docker à utiliser (Keycloak version 21.1.1 depuis Quay.io)
-    environment: # Liste des variables d'environnement à injecter dans le conteneur
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin} # Utilise la variable d'environnement KEYCLOAK_ADMIN définie dans le fichier .env ou par le système, sinon utilise 'admin' par défaut
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin} # Utilise la variable d'environnement KEYCLOAK_ADMIN_PASSWORD définie dans le fichier .env ou par le système, sinon utilise 'admin' par défaut
-    ports:
-      - "9090:8080" # Redirige le port 8080 du conteneur (port par défaut de Keycloak) vers le port 9090 de la machine hôte
-    command:
-      - "start-dev" # Commande exécutée lors du démarrage du conteneur (ici, démarre Keycloak en mode développement)
+version: '3.8'  # Version du fichier docker-compose, ici on utilise la version 3.8 qui est plus récente
 
+services:
+  keycloak-spring-boot:  # Définition du service Spring Boot
+    container_name: keycloak-spring-boot  # Nom du conteneur pour une identification simple
+    build:
+      context: ./  # Le contexte de construction est le répertoire actuel
+      dockerfile: Dockerfile  # Indique le fichier Docker à utiliser pour la construction de l'image
+    ports:
+      - "8080:8080"  # Mappe le port 8080 du conteneur au port 8080 de l'hôte
+#    networks:
+#      - keycloak-network  # Le service est connecté au réseau 'keycloak-network'
+#
+#networks:
+#  keycloak-network:  # Définit le réseau 'keycloak-network'
+#    external:
+#      name: keycloak-network  # Utilise un réseau Docker existant appelé 'keycloak-network'
