@@ -7,7 +7,7 @@ services:
       context: ./  # Le contexte de construction est le répertoire actuel
       dockerfile: Dockerfile  # Indique le fichier Docker à utiliser pour la construction de l'image
     ports:
-      - "8080:8080"  # Mappe le port 8080 du conteneur au port 8080 de l'hôte
+      - "8081:8081"  # Mappe le port 8080 du conteneur au port 8080 de l'hôte
 #    networks:
 #      - keycloak-network  # Le service est connecté au réseau 'keycloak-network'
 #
