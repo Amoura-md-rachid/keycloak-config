@@ -29,7 +29,7 @@ WORKDIR /opt/app
 COPY --from=builder /opt/app/target/*.jar /opt/app/app.jar
 # Copie le JAR depuis l'étape de construction
 
-EXPOSE 8080
+EXPOSE 8081
 # Expose le port 8080 pour le serveur
 
 ENTRYPOINT ["java", "-jar", "/opt/app/app.jar"]

@@ -1,17 +1,15 @@
-version: '3.8'  # Version du fichier docker-compose, ici on utilise la version 3.8 qui est plus récente
-
 services:
-  keycloak-spring-boot:  # Définition du service Spring Boot
-    container_name: keycloak-spring-boot  # Nom du conteneur pour une identification simple
+  keycloak-spring-boot:
+    container_name: keycloak-spring-boot
     build:
       context: ./  # Le contexte de construction est le répertoire actuel
-      dockerfile: Dockerfile  # Indique le fichier Docker à utiliser pour la construction de l'image
+      dockerfile: Dockerfile  # Fichier Docker à utiliser
     ports:
-      - "8081:8081"  # Mappe le port 8080 du conteneur au port 8080 de l'hôte
-#    networks:
-#      - keycloak-network  # Le service est connecté au réseau 'keycloak-network'
-#
-#networks:
-#  keycloak-network:  # Définit le réseau 'keycloak-network'
-#    external:
-#      name: keycloak-network  # Utilise un réseau Docker existant appelé 'keycloak-network'
+      - "8081:8081"  # Mappe le port 8081
+    networks:
+      - keycloak-network  # Ajoute le service au réseau 'keycloak-network'
+
+networks:
+  keycloak-network:
+    external:
+      name: keycloak-network  # Utilise un réseau Docker existant appelé 'keycloak-network'
