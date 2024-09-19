@@ -57,10 +57,16 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-spring-app:${{ github.sha }}
-            docker stop my-spring-app || true
-            docker rm my-spring-app || true
-            docker run -d --name my-spring-app -p 8081:8081 ${{ secrets.DOCKERHUB_USERNAME }}/my-spring-app:${{ github.sha }}
-          '
+          # Écrit la clé privée dans un fichier sécurisé
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private_key && chmod 600 private_key
+          
+          # Nettoie les entrées SSH existantes pour l'hôte
+          ssh-keygen -R ${{ secrets.EC2_HOST }} || true
+          
+          # Connecte-toi à l'instance EC2 et exécute les commandes Docker
+          ssh -v -o StrictHostKeyChecking=no -i private_key "${USER}@${HOST}" "
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-spring-app:${{ github.sha }}
+            sudo docker stop my-spring-app || true
+            sudo docker rm my-spring-app || true
+            sudo docker run -d --name my-spring-app -p 8081:8081 ${{ secrets.DOCKERHUB_USERNAME }}/my-spring-app:${{ github.sha }}
+          "
