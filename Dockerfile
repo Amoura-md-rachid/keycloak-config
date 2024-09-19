@@ -9,6 +9,9 @@ COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 # Copie les fichiers nécessaires pour Maven Wrapper et pom.xml
 
+RUN chmod +x mvnw
+# Donne les permissions d'exécution au script Maven Wrapper
+
 RUN ./mvnw dependency:go-offline
 # Télécharge les dépendances Maven et les met en cache
 
@@ -30,7 +33,7 @@ COPY --from=builder /opt/app/target/*.jar /opt/app/app.jar
 # Copie le JAR depuis l'étape de construction
 
 EXPOSE 8081
-# Expose le port 8080 pour le serveur
+# Expose le port 8081 pour le serveur
 
 ENTRYPOINT ["java", "-jar", "/opt/app/app.jar"]
 # Commande stricte pour démarrer l'application
