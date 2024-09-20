@@ -62,7 +62,11 @@ jobs:
             echo "Erreur: La variable HOST n'est pas définie."
             exit 1
           fi
+<<<<<<< HEAD
           
+=======
+  
+>>>>>>> 742635f24f822530e9c75080aa517fc29cb53c48
           # Écrit la clé privée dans un fichier sécurisé
           echo "$PRIVATE_KEY" > private_key
           chmod 600 private_key
@@ -80,7 +84,11 @@ jobs:
           # Tentative de connexion SSH avec débogage verbeux
           echo "Tentative de connexion SSH..."
           ssh -v -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} "echo 'Connexion SSH réussie'"
+<<<<<<< HEAD
           
+=======
+  
+>>>>>>> 742635f24f822530e9c75080aa517fc29cb53c48
           # Si la connexion réussit, exécuter les commandes Docker
           if [ $? -eq 0 ]; then
             echo "Exécution des commandes Docker..."
@@ -93,4 +101,8 @@ jobs:
           else
             echo "Échec de la connexion SSH"
             exit 1
+<<<<<<< HEAD
           fi
+=======
+          fi
+>>>>>>> 742635f24f822530e9c75080aa517fc29cb53c48
