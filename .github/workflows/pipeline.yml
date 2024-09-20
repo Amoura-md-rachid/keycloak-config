@@ -49,19 +49,48 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
     steps:
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-spring-app:${{ github.sha }}
-            docker stop my-spring-app || true
-            docker rm my-spring-app || true
-            docker run -d --name my-spring-app -p 8081:8081 ${{ secrets.DOCKERHUB_USERNAME }}/my-spring-app:${{ github.sha }}
-          '
+          # Vérifie si HOST est défini
+          if [ -z "$HOST" ]; then
+            echo "Erreur: La variable HOST n'est pas définie."
+            exit 1
+          fi
+          
+          # Écrit la clé privée dans un fichier sécurisé
+          echo "$PRIVATE_KEY" > private_key
+          chmod 600 private_key
+          
+          # Debug: Affiche les premières lignes de la clé privée (sans révéler le contenu complet)
+          head -n 1 private_key
+          
+          # Debug: Vérifier la connectivité (en spécifiant le port SSH 22)
+          echo "Vérification de la connectivité à $HOST sur le port 22"
+          nc -zv $HOST 22
+          
+          # Debug: Afficher les informations de l'hôte SSH
+          ssh-keyscan $HOST
+          
+          # Tentative de connexion SSH avec débogage verbeux
+          echo "Tentative de connexion SSH..."
+          ssh -v -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} "echo 'Connexion SSH réussie'"
+          
+          # Si la connexion réussit, exécuter les commandes Docker
+          if [ $? -eq 0 ]; then
+            echo "Exécution des commandes Docker..."
+            ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} "
+              sudo docker pull ${DOCKERHUB_USERNAME}/my-spring-app:${{ github.sha }} &&
+              sudo docker stop my-spring-app || true &&
+              sudo docker rm my-spring-app || true &&
+              sudo docker run -d --name my-spring-app -p 8081:8081 ${DOCKERHUB_USERNAME}/my-spring-app:${{ github.sha }}
+            "
+          else
+            echo "Échec de la connexion SSH"
+            exit 1
+          fi
